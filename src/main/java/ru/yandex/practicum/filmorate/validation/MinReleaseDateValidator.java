@@ -15,7 +15,18 @@ import java.time.format.DateTimeParseException;
 @Slf4j
 public class MinReleaseDateValidator implements ConstraintValidator<MinReleaseDate, String> {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    private static final LocalDate MIN_DATE = LocalDate.of(1895, 12, 28);
+    private LocalDate minDate;
+
+
+    @Override
+    public void initialize(MinReleaseDate constraintAnnotation) {
+        try {
+            minDate = LocalDate.parse(constraintAnnotation.value(), FORMATTER);
+        } catch (DateTimeParseException e) {
+            log.error("Некорректный формат даты в аннотации: '{}'", constraintAnnotation.value());
+            throw new IllegalArgumentException("Дата в аннотации должна быть в формате yyyy-MM-dd");
+        }
+    }
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
@@ -24,7 +35,7 @@ public class MinReleaseDateValidator implements ConstraintValidator<MinReleaseDa
         }
         try {
             LocalDate date = LocalDate.parse(value, FORMATTER);
-            return !date.isBefore(MIN_DATE);
+            return !date.isBefore(minDate);
         } catch (DateTimeParseException e) {
             log.warn("Некорректный формат даты: '{}', ожидается yyyy-MM-dd", value);
             return true;

@@ -38,7 +38,7 @@ public class FilmControllerTest {
         film.setName("Film");
         film.setDescription("Description");
         film.setReleaseDate("2001-01-01");
-        film.setDuration(120);
+        film.setDuration(120L);
     }
 
     @Test
@@ -98,7 +98,7 @@ public class FilmControllerTest {
 
     @Test
     void createMovieWithNegativeDurationLeadsToErrorBadRequest() throws Exception {
-        film.setDuration(-120);
+        film.setDuration(-120L);
         mockMvc.perform(MockMvcRequestBuilders.post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))

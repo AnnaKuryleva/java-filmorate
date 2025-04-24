@@ -16,6 +16,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = MinReleaseDateValidator.class)
 public @interface MinReleaseDate {
+    String value();
     String message() default "Дата релиза не должна быть раньше 28 декабря 1895 года";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};

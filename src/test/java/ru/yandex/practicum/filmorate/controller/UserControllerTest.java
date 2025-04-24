@@ -18,6 +18,7 @@ import ru.yandex.practicum.filmorate.model.User;
  * Класс содержит тесты для проверки операций с пользователями,
  * таких как создание, обновление и получение списка пользователей, с использованием Spring Boot и MockMvc.
  */
+
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
