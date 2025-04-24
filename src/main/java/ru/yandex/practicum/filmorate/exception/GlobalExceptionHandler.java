@@ -92,4 +92,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errors, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(jakarta.validation.ValidationException.class)
+    public ResponseEntity<Map<String, Object>> handleValidationException(jakarta.validation.ValidationException e) {
+        log.error("Ошибка валидации: {}", e.getMessage(), e);
+        Map<String, Object> errors = new HashMap<>();
+        errors.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        errors.put("error", "Validation Configuration Error");
+        errors.put("message", "Дата в аннотации должна быть в формате yyyy-MM-dd");
+        return new ResponseEntity<>(errors, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

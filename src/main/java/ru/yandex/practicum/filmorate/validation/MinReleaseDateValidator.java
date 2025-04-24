@@ -24,7 +24,6 @@ public class MinReleaseDateValidator implements ConstraintValidator<MinReleaseDa
             minDate = LocalDate.parse(constraintAnnotation.value(), FORMATTER);
         } catch (DateTimeParseException e) {
             log.error("Некорректный формат даты в аннотации: '{}'", constraintAnnotation.value());
-            throw new IllegalArgumentException("Дата в аннотации должна быть в формате yyyy-MM-dd");
         }
     }
 
