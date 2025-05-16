@@ -29,7 +29,7 @@ public class FilmController {
         return films.findAll();
     }
 
-    @GetMapping("/films/popular")
+    @GetMapping("/popular")
     public List<Film> getTopFilms(@RequestParam(defaultValue = "10") int count) {
         log.info("Получен запрос на получение списка самых популярных фильмов");
         return films.getTopFilms(count);
