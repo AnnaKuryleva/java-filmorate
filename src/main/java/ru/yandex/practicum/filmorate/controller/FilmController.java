@@ -29,12 +29,11 @@ public class FilmController {
         return films.findAll();
     }
 
-    @GetMapping("/popular?count={count}")
-    public List<Film> getTopFilms(@PathVariable Integer count) {
+    @GetMapping("/films/popular")
+    public List<Film> getTopFilms(@RequestParam(defaultValue = "10") int count) {
         log.info("Получен запрос на получение списка самых популярных фильмов");
         return films.getTopFilms(count);
     }
-
 
     @PostMapping
     public Film create(@Valid @RequestBody Film newFilm) {

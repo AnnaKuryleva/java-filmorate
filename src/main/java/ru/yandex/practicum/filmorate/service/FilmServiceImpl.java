@@ -62,10 +62,13 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public void deleteLike(Long userId, Long filmId) {
-        filmStorage.findById(filmId)
+        Film film = filmStorage.findById(filmId)
                 .orElseThrow(() -> new NotFoundException("Фильм с id = " + filmId + " не найден"));
         userStorage.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id = " + userId + " не найден"));
+        if (!film.getLikes().contains(userId)) {
+            throw new NotFoundException("Лайк от пользователя с id = " + userId + " у фильма с id = " + filmId + " не найден");
+        }
         filmStorage.removeLike(filmId, userId);
     }
 
