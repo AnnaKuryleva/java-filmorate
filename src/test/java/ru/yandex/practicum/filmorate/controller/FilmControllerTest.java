@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 
 /**
  * Тестовый класс для проверки функциональности {@link FilmController}.
@@ -30,6 +31,7 @@ public class FilmControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
     private Film film;
+    private User user;
 
     @BeforeEach
     void setUp() {
@@ -39,6 +41,13 @@ public class FilmControllerTest {
         film.setDescription("Description");
         film.setReleaseDate("2001-01-01");
         film.setDuration(120L);
+
+        user = new User();
+        user.setId(1L);
+        user.setEmail("JohnSnow@mail.ru");
+        user.setLogin("JohnSnow");
+        user.setName("JohnSnow");
+        user.setBirthday("2000-01-01");
     }
 
     @Test
@@ -125,7 +134,7 @@ public class FilmControllerTest {
                         .content(objectMapper.writeValueAsString(film)))
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message")
-                        .value("Пост с id = 10 не найден"));
+                        .value("Фильм с id = 10 не найден"));
     }
 
     @Test
@@ -145,5 +154,48 @@ public class FilmControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("FilmUpdate"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("DescriptionUpdate"));
+    }
+
+    @Test
+    void addLikeFromNonExistentUserWillResultErrorNotFoundException() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(film)))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/films/1/like/999"))
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message")
+                        .value("Пользователь с id = 999 не найден"));
+    }
+
+    @Test
+    void addLikeToExistingFilmFromValidUserIsSuccessful() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(film)))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(user)))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+        mockMvc.perform(MockMvcRequestBuilders.put("/films/1/like/1"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    void deleteLikeFromExistingFilmByValidUserIsSuccessful() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(film)))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(user)))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+        mockMvc.perform(MockMvcRequestBuilders.put("/films/1/like/1"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+        mockMvc.perform(MockMvcRequestBuilders.delete("/films/1/like/1"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 }
