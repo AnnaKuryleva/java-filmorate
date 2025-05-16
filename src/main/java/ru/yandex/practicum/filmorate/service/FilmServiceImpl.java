@@ -53,10 +53,11 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public void addLike(Long userId, Long filmId) {
+        userStorage.findById(userId)
+            .orElseThrow(() -> new NotFoundException("Пользователь с id = " + userId + " не найден"));
         filmStorage.findById(filmId)
                 .orElseThrow(() -> new NotFoundException("Фильм с id = " + filmId + " не найден"));
-        userStorage.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь с id = " + userId + " не найден"));
+
         filmStorage.addLike(filmId, userId);
     }
 
