@@ -5,6 +5,8 @@ import lombok.Data;
 import ru.yandex.practicum.filmorate.validation.MinReleaseDate;
 import ru.yandex.practicum.filmorate.validation.ValidDate;
 
+import java.util.Set;
+
 @Data
 public class Film {
     private Long id;
@@ -20,4 +22,5 @@ public class Film {
     @NotNull(message = "Продолжительность фильма не может быть null")
     @Positive(message = "продолжительность фильма не может быть отрицательной или равной нулю")
     private Long duration;
+    private Set<Long> likes;
 }
