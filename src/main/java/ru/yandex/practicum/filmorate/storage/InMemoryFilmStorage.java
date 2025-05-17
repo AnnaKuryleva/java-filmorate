@@ -10,6 +10,15 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     private final Map<Long, Film> films = new HashMap<>();
 
+    public long getNextId() {
+        long currentMaxId = films.values()
+                .stream()
+                .mapToLong(Film::getId)
+                .max()
+                .orElse(0);
+        return ++currentMaxId;
+    }
+
     @Override
     public Collection<Film> findAll() {
         return films.values();

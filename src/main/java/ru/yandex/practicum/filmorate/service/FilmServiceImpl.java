@@ -19,15 +19,6 @@ public class FilmServiceImpl implements FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
-    private long getNextId() {
-        long currentMaxId = filmStorage.findAll()
-                .stream()
-                .mapToLong(Film::getId)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
-    }
-
     @Override
     public Collection<Film> findAll() {
         return filmStorage.findAll();
@@ -35,7 +26,7 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film create(Film newFilm) {
-        newFilm.setId(getNextId());
+        newFilm.setId(filmStorage.getNextId());
         filmStorage.save(newFilm);
         return newFilm;
     }

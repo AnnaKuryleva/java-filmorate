@@ -7,7 +7,17 @@ import java.util.*;
 
 @Component
 public class InMemoryUserStorage implements UserStorage {
+
     private final Map<Long, User> users = new HashMap<>();
+
+    public long getNextId() {
+        long currentMaxId = users.values()
+                .stream()
+                .mapToLong(User::getId)
+                .max()
+                .orElse(0);
+        return ++currentMaxId;
+    }
 
     @Override
     public Collection<User> findAll() {

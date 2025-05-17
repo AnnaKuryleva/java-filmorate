@@ -15,15 +15,6 @@ public class UserServiceImpl implements UserService {
 
     private final UserStorage userStorage;
 
-    private long getNextId() {
-        long currentMaxId = userStorage.findAll()
-                .stream()
-                .mapToLong(User::getId)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
-    }
-
     @Override
     public Collection<User> findAll() {
         return userStorage.findAll();
@@ -34,7 +25,7 @@ public class UserServiceImpl implements UserService {
         if (newUser.getName() == null || newUser.getName().isBlank()) {
             newUser.setName(newUser.getLogin());
         }
-        newUser.setId(getNextId());
+        newUser.setId(userStorage.getNextId());
         userStorage.save(newUser);
         return newUser;
     }
