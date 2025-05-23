@@ -5,6 +5,8 @@ import lombok.Data;
 import ru.yandex.practicum.filmorate.validation.PastDate;
 import ru.yandex.practicum.filmorate.validation.ValidDate;
 
+import java.util.Set;
+
 @Data
 public class User {
     private Long id;
@@ -19,4 +21,5 @@ public class User {
     @ValidDate(message = "Дата дня рождения должна быть в формате yyyy-MM-dd")
     @PastDate
     private String birthday;
+    private Set<Long> friends;
 }
