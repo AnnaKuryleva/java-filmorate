@@ -2,82 +2,99 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dao.GenreDao;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.dao.FilmDao;
+import ru.yandex.practicum.filmorate.dao.MpaDao;
+import ru.yandex.practicum.filmorate.dao.UserDao;
+import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class FilmServiceImpl implements FilmService {
-
-    private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
+    private final FilmDao filmDao;
+    private final UserDao userDao;
+    private final MpaDao mpaDao;
+    private final GenreDao genreDao;
 
     @Override
     public Collection<Film> findAll() {
-        return filmStorage.findAll();
+        return filmDao.findAll();
     }
 
     @Override
     public Film create(Film newFilm) {
-        newFilm.setId(filmStorage.getNextId());
-        filmStorage.save(newFilm);
-        return newFilm;
-    }
-
-    @Override
-    public void update(Film newFilm) {
-        Film oldFilm = filmStorage.findById(newFilm.getId())
-                .orElseThrow(() -> new NotFoundException("Фильм с id = " + newFilm.getId() + " не найден"));
-        oldFilm.setName(newFilm.getName());
-        oldFilm.setDescription(newFilm.getDescription());
-        oldFilm.setReleaseDate(newFilm.getReleaseDate());
-        oldFilm.setDuration(newFilm.getDuration());
-        filmStorage.save(oldFilm);
+        if (newFilm.getMpaRating() == null || newFilm.getMpaRating().getRatingId() == null) {
+            throw new IllegalArgumentException("Рейтинг MPA обязателен");
+        }
+        mpaDao.findById(newFilm.getMpaRating().getRatingId())
+                .orElseThrow(() -> new NotFoundException("Рейтинг с id = " +
+                        newFilm.getMpaRating().getRatingId() + " не найден"));
+        if (newFilm.getGenres() != null && !newFilm.getGenres().isEmpty()) {
+            for (Genre genre : newFilm.getGenres()) {
+                if (genre.getGenreId() == null) {
+                    throw new IllegalArgumentException("ID жанра обязателен");
+                }
+                genreDao.findById(genre.getGenreId())
+                        .orElseThrow(() -> new NotFoundException("Жанр с id = " + genre.getGenreId() + " не найден"));
+            }
+        }
+        return filmDao.save(newFilm);
     }
 
     @Override
     public void addLike(Long userId, Long filmId) {
-        userStorage.findById(userId)
-            .orElseThrow(() -> new NotFoundException("Пользователь с id = " + userId + " не найден"));
-        filmStorage.findById(filmId)
+        userDao.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id = " + userId + " не найден"));
+        filmDao.findById(filmId)
                 .orElseThrow(() -> new NotFoundException("Фильм с id = " + filmId + " не найден"));
-
-        filmStorage.addLike(filmId, userId);
+        filmDao.addLike(filmId, userId);
     }
 
     @Override
     public void deleteLike(Long userId, Long filmId) {
-        Film film = filmStorage.findById(filmId)
-                .orElseThrow(() -> new NotFoundException("Фильм с id = " + filmId + " не найден"));
-        userStorage.findById(userId)
+        userDao.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id = " + userId + " не найден"));
-        if (!film.getLikes().contains(userId)) {
-            throw new NotFoundException("Лайк от пользователя с id = " + userId + " у фильма с id = " + filmId + " не найден");
-        }
-        filmStorage.removeLike(filmId, userId);
+        filmDao.findById(filmId)
+                .orElseThrow(() -> new NotFoundException("Фильм с id = " + filmId + " не найден"));
+        filmDao.removeLike(filmId, userId);
     }
 
     @Override
     public List<Film> getTopFilms(int count) {
-        return filmStorage.findAll().stream()
-                .sorted(Comparator.comparingInt((Film film) -> film.getLikes() != null ? film.getLikes().size() : 0)
-                        .reversed())
-                .limit(count)
-                .collect(Collectors.toList());
+        return filmDao.getTopFilms(count);
     }
 
     @Override
     public Film findById(Long id) {
-        return filmStorage.findById(id)
+        return filmDao.findById(id)
                 .orElseThrow(() -> new NotFoundException("Фильм с id = " + id + " не найден"));
     }
 
+    @Override
+    public Film update(Film newFilm) {
+        filmDao.findById(newFilm.getId())
+                .orElseThrow(() -> new NotFoundException("Фильм с id = " + newFilm.getId() + " не найден"));
+        if (newFilm.getMpaRating() == null || newFilm.getMpaRating().getRatingId() == null) {
+            throw new IllegalArgumentException("Рейтинг MPA обязателен");
+        }
+        mpaDao.findById(newFilm.getMpaRating().getRatingId())
+                .orElseThrow(() -> new NotFoundException("Рейтинг с id = " + newFilm.getMpaRating().getRatingId() +
+                        " не найден"));
+        if (newFilm.getGenres() != null && !newFilm.getGenres().isEmpty()) {
+            for (Genre genre : newFilm.getGenres()) {
+                if (genre.getGenreId() == null) {
+                    throw new IllegalArgumentException("ID жанра обязателен");
+                }
+                genreDao.findById(genre.getGenreId())
+                        .orElseThrow(() -> new NotFoundException("Жанр с id = " + genre.getGenreId() + " не найден"));
+            }
+        }
+        filmDao.updateFilm(newFilm.getId(), newFilm);
+        return newFilm;
+    }
 }
-

@@ -6,7 +6,6 @@ import ru.yandex.practicum.filmorate.validation.MinReleaseDate;
 import ru.yandex.practicum.filmorate.validation.ValidDate;
 
 import java.util.Set;
-
 @Data
 public class Film {
     private Long id;
@@ -23,4 +22,8 @@ public class Film {
     @Positive(message = "продолжительность фильма не может быть отрицательной или равной нулю")
     private Long duration;
     private Set<Long> likes;
+    @NotEmpty(message = "Список жанров не может быть пустым")
+    private Set<Genre> genres;
+    @NotNull(message = "Рейтинг MPA не может быть null")
+    private MpaRating mpaRating;
 }

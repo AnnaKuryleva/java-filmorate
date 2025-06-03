@@ -12,7 +12,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.model.User;
+import java.util.Arrays;
+import java.util.HashSet;
 
 /**
  * Тестовый класс для проверки функциональности {@link FilmController}.
@@ -42,9 +46,24 @@ public class FilmControllerTest {
         film.setReleaseDate("2001-01-01");
         film.setDuration(120L);
 
+        Genre genre1 = new Genre();
+        genre1.setGenreId(1L);
+        genre1.setName("Комедия");
+
+        Genre genre2 = new Genre();
+        genre2.setGenreId(2L);
+        genre2.setName("Драма");
+
+        film.setGenres(new HashSet<>(Arrays.asList(genre1, genre2)));
+
+        MpaRating mpaRating = new MpaRating();
+        mpaRating.setRatingId(1);
+        mpaRating.setName("RG");
+        film.setMpaRating(mpaRating);
+
         user = new User();
         user.setId(1L);
-        user.setEmail("JohnSnow@mail.ru");
+        user.setEmail("JohnSnow" + System.currentTimeMillis() + "@mail.ru");
         user.setLogin("JohnSnow");
         user.setName("JohnSnow");
         user.setBirthday("2000-01-01");
@@ -171,31 +190,42 @@ public class FilmControllerTest {
 
     @Test
     void addLikeToExistingFilmFromValidUserIsSuccessful() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+        String filmResponse = mockMvc.perform(MockMvcRequestBuilders.post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        Long filmId = objectMapper.readTree(filmResponse).path("id").asLong();
+        user.setEmail("JohnSnow" + System.currentTimeMillis() + "@mail.ru");
+        String userResponse = mockMvc.perform(MockMvcRequestBuilders.post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(user)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-        mockMvc.perform(MockMvcRequestBuilders.put("/films/1/like/1"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        Long userId = objectMapper.readTree(userResponse).path("id").asLong();
+        mockMvc.perform(MockMvcRequestBuilders.put("/films/" + filmId + "/like/" + userId))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
     void deleteLikeFromExistingFilmByValidUserIsSuccessful() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+        String filmResponse = mockMvc.perform(MockMvcRequestBuilders.post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        Long filmId = objectMapper.readTree(filmResponse).path("id").asLong();
+        user.setEmail("JohnSnow" + System.currentTimeMillis() + "@mail.ru");
+        String userResponse = mockMvc.perform(MockMvcRequestBuilders.post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(user)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        Long userId = objectMapper.readTree(userResponse).path("id").asLong();
+        mockMvc.perform(MockMvcRequestBuilders.put("/films/" + filmId + "/like/" + userId))
                 .andExpect(MockMvcResultMatchers.status().isOk());
-        mockMvc.perform(MockMvcRequestBuilders.put("/films/1/like/1"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-        mockMvc.perform(MockMvcRequestBuilders.delete("/films/1/like/1"))
+        mockMvc.perform(MockMvcRequestBuilders.delete("/films/" + filmId + "/like/" + userId))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
+
 }

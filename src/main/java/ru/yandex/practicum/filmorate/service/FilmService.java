@@ -10,8 +10,6 @@ public interface FilmService {
 
     Film create(Film newFilm);
 
-    void update(Film newFilm);
-
     void addLike(Long userId, Long filmId);
 
     void deleteLike(Long userId, Long filmId);
@@ -19,4 +17,7 @@ public interface FilmService {
     List<Film> getTopFilms(int count);
 
     Film findById(Long id);
+
+    Film update(Film newFilm);
+
 }

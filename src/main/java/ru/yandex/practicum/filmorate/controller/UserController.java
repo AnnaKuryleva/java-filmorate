@@ -73,5 +73,4 @@ public class UserController {
         log.info("Пользователь с id={} удалил из в друзей пользователя с id={}", id, friendId);
         return users.findById(id);
     }
-
 }
