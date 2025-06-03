@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.validation.MinReleaseDate;
 import ru.yandex.practicum.filmorate.validation.ValidDate;
 
 import java.util.Set;
+
 @Data
 public class Film {
     private Long id;
