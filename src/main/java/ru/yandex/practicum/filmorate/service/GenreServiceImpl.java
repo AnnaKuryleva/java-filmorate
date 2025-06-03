@@ -9,7 +9,7 @@ import java.util.Collection;
 
 @Service
 @RequiredArgsConstructor
-public class GenreServiceImpl  implements GenreService{
+public class GenreServiceImpl implements GenreService {
     private final GenreDao genreDao;
 
     public Collection<Genre> findAll() {
