@@ -203,7 +203,7 @@ public class FilmControllerTest {
                         .content(objectMapper.writeValueAsString(film)))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/films/1/like/999"))
+        mockMvc.perform(MockMvcRequestBuilders.put("/films/1/like/99999999"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message")
                         .value("Пользователь с id = 999 не найден"));
