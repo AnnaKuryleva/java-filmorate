@@ -21,6 +21,11 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 /**
  * Тестовый класс для проверки функциональности {@link FilmController}.
  * Класс содержит тесты для проверки операций с фильмами,
@@ -84,66 +89,66 @@ public class FilmControllerTest {
     @Test
     void createMovieWithEmptyNameWillResultErrorBadRequest() throws Exception {
         film.setName("");
-        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+        mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.messages.name")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.messages.name")
                         .value("Название фильма не может быть пустым"));
     }
 
     @Test
     void createMovieWithEmptyDescriptionWillResultErrorBadRequest() throws Exception {
         film.setDescription("");
-        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+        mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.messages.description")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.messages.description")
                         .value("Описание фильма не может быть пустым"));
     }
 
     @Test
     void createMovieWithDescriptionOfMoreThan200CharactersWillResultErrorBadRequest() throws Exception {
         film.setDescription("a".repeat(201));
-        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+        mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.messages.description")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.messages.description")
                         .value("Описание фильма должно включать не более 200 символов"));
     }
 
     @Test
     void createMovieWithEmptyReleaseDateLeadsToErrorBadRequest() throws Exception {
         film.setReleaseDate(null);
-        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+        mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.messages.releaseDate")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.messages.releaseDate")
                         .value("Дата релиза не может быть null"));
     }
 
     @Test
     void createMovieWithReleaseDateWrongFormatLeadsToErrorBadRequest() throws Exception {
         film.setReleaseDate("2001.01.01");
-        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+        mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.messages.releaseDate")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.messages.releaseDate")
                         .value("Дата релиза должна быть в формате yyyy-MM-dd"));
     }
 
     @Test
     void createMovieWithNegativeDurationLeadsToErrorBadRequest() throws Exception {
         film.setDuration(-120L);
-        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+        mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.messages.duration")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.messages.duration")
                         .value("продолжительность фильма не может быть отрицательной или равной нулю"));
     }
 
@@ -156,12 +161,12 @@ public class FilmControllerTest {
         mpa.setRatingId(ratingId);
         mpa.setName("G");
         film.setMpa(mpa);
-        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+        mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Film"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("Description"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Film"))
+                .andExpect(jsonPath("$.description").value("Description"));
     }
 
     @Test
@@ -170,17 +175,17 @@ public class FilmControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.put("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))
-                .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message")
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message")
                         .value("Фильм с id = 10 не найден"));
     }
 
     @Test
     void updateMovieWithFoundIdIsSuccessful() throws Exception {
-        String response = mockMvc.perform(MockMvcRequestBuilders.post("/films")
+        String response = mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
@@ -191,61 +196,77 @@ public class FilmControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.put("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("FilmUpdate"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("DescriptionUpdate"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("FilmUpdate"))
+                .andExpect(jsonPath("$.description").value("DescriptionUpdate"));
     }
 
     @Test
     void addLikeFromNonExistentUserWillResultErrorNotFoundException() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+        mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(status().isOk());
 
         mockMvc.perform(MockMvcRequestBuilders.put("/films/1/like/99999999"))
-                .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message")
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message")
                         .value("Пользователь с id = 99999999 не найден"));
     }
 
     @Test
     void addLikeToExistingFilmFromValidUserIsSuccessful() throws Exception {
-        String filmResponse = mockMvc.perform(MockMvcRequestBuilders.post("/films")
+        String filmResponse = mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         Long filmId = objectMapper.readTree(filmResponse).path("id").asLong();
         user.setEmail("JohnSnow" + System.currentTimeMillis() + "@mail.ru");
-        String userResponse = mockMvc.perform(MockMvcRequestBuilders.post("/users")
+        String userResponse = mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(user)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         Long userId = objectMapper.readTree(userResponse).path("id").asLong();
         mockMvc.perform(MockMvcRequestBuilders.put("/films/" + filmId + "/like/" + userId))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(status().isOk());
     }
 
     @Test
     void deleteLikeFromExistingFilmByValidUserIsSuccessful() throws Exception {
-        String filmResponse = mockMvc.perform(MockMvcRequestBuilders.post("/films")
+        String filmResponse = mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         Long filmId = objectMapper.readTree(filmResponse).path("id").asLong();
         user.setEmail("JohnSnow" + System.currentTimeMillis() + "@mail.ru");
-        String userResponse = mockMvc.perform(MockMvcRequestBuilders.post("/users")
+        String userResponse = mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(user)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         Long userId = objectMapper.readTree(userResponse).path("id").asLong();
         mockMvc.perform(MockMvcRequestBuilders.put("/films/" + filmId + "/like/" + userId))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(status().isOk());
         mockMvc.perform(MockMvcRequestBuilders.delete("/films/" + filmId + "/like/" + userId))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void getFilmWithGenresReturnsCorrectGenres() throws Exception {
+        String filmResponse = mockMvc.perform(post("/films")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(film)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        Long filmId = objectMapper.readTree(filmResponse).path("id").asLong();
+        Long comedyId = jdbcTemplate.queryForObject(
+                "SELECT genre_id FROM genres WHERE name = 'Комедия'", Long.class);
+        mockMvc.perform(get("/films/{id}", filmId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.genres[0].id").value(comedyId.intValue())) // Проверяем, что id = 1
+                .andExpect(jsonPath("$.genres[0].name").value("Комедия"));
     }
 }
