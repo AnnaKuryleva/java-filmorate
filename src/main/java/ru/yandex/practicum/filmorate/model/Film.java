@@ -26,5 +26,5 @@ public class Film {
     @NotEmpty(message = "Список жанров не может быть пустым")
     private Set<Genre> genres;
     @NotNull(message = "Рейтинг MPA не может быть null")
-    private MpaRating mpaRating;
+    private Mpa mpa;
 }

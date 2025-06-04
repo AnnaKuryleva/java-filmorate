@@ -55,6 +55,12 @@ WHERE NOT EXISTS (SELECT 1 FROM genre_id_film_id
                   WHERE film_id = (SELECT id FROM films WHERE name = 'Брат')
                     AND genre_id = (SELECT genre_id FROM genres WHERE name = 'Драма'));
 INSERT INTO genre_id_film_id (film_id, genre_id)
+SELECT (SELECT id FROM films WHERE name = 'Брат'),
+       (SELECT genre_id FROM genres WHERE name = 'Комедия')
+WHERE NOT EXISTS (SELECT 1 FROM genre_id_film_id
+                  WHERE film_id = (SELECT id FROM films WHERE name = 'Брат')
+                    AND genre_id = (SELECT genre_id FROM genres WHERE name = 'Комедия'));
+INSERT INTO genre_id_film_id (film_id, genre_id)
 SELECT (SELECT id FROM films WHERE name = 'Сталкер'),
        (SELECT genre_id FROM genres WHERE name = 'Фантастика')
 WHERE NOT EXISTS (SELECT 1 FROM genre_id_film_id

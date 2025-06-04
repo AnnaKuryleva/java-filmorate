@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.dao;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.model.MpaRating;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,21 +17,21 @@ public class MpaDaoImpl implements MpaDao {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    private MpaRating mapToMpaRating(ResultSet rs, int rowNum) throws SQLException {
-        MpaRating mpaRating = new MpaRating();
-        mpaRating.setRatingId(rs.getInt("rating_id"));
-        mpaRating.setName(rs.getString("name"));
-        return mpaRating;
+    private Mpa mapToMpaRating(ResultSet rs, int rowNum) throws SQLException {
+        Mpa mpa = new Mpa();
+        mpa.setRatingId(rs.getInt("rating_id"));
+        mpa.setName(rs.getString("name"));
+        return mpa;
     }
 
     @Override
-    public Collection<MpaRating> findAll() {
+    public Collection<Mpa> findAll() {
         String sql = "SELECT * FROM rating";
         return jdbcTemplate.query(sql, this::mapToMpaRating);
     }
 
     @Override
-    public Optional<MpaRating> findById(Integer id) {
+    public Optional<Mpa> findById(Integer id) {
         String sql = "SELECT * FROM rating WHERE rating_id = ?";
         return jdbcTemplate.query(sql, this::mapToMpaRating, id)
                 .stream()

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.MpaRating;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -32,10 +32,10 @@ public class FilmDaoImpl implements FilmDao {
         film.setDescription(resultSet.getString("description"));
         film.setReleaseDate(resultSet.getString("release_date"));
         film.setDuration(resultSet.getLong("duration"));
-        MpaRating mpaRating = new MpaRating();
-        mpaRating.setRatingId(resultSet.getInt("rating_id"));
-        mpaRating.setName(resultSet.getString("rating_name"));
-        film.setMpaRating(mpaRating);
+        Mpa mpa = new Mpa();
+        mpa.setRatingId(resultSet.getInt("rating_id"));
+        mpa.setName(resultSet.getString("rating_name"));
+        film.setMpa(mpa);
 
         String likesSql = "SELECT user_id FROM likes WHERE film_id = ?";
         film.setLikes(new HashSet<>(jdbcTemplate.query(likesSql,
@@ -75,7 +75,7 @@ public class FilmDaoImpl implements FilmDao {
             ps.setString(2, newFilm.getDescription());
             ps.setString(3, newFilm.getReleaseDate());
             ps.setLong(4, newFilm.getDuration());
-            ps.setInt(5, newFilm.getMpaRating().getRatingId());
+            ps.setInt(5, newFilm.getMpa().getRatingId());
             return ps;
         }, keyHolder);
         newFilm.setId(keyHolder.getKey().longValue());
@@ -130,7 +130,7 @@ public class FilmDaoImpl implements FilmDao {
                 updatedFilm.getDescription(),
                 updatedFilm.getReleaseDate(),
                 updatedFilm.getDuration(),
-                updatedFilm.getMpaRating().getRatingId(),
+                updatedFilm.getMpa().getRatingId(),
                 id);
         if (rowsAffected == 0) {
             throw new NotFoundException("Фильм с id = " + id + " не найден");

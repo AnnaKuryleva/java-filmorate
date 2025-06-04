@@ -1,12 +1,12 @@
 package ru.yandex.practicum.filmorate.dao;
 
-import ru.yandex.practicum.filmorate.model.MpaRating;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.util.Collection;
 import java.util.Optional;
 
 public interface MpaDao {
-    Collection<MpaRating> findAll();
+    Collection<Mpa> findAll();
 
-    Optional<MpaRating> findById(Integer id);
+    Optional<Mpa> findById(Integer id);
 }

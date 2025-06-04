@@ -28,12 +28,12 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film create(Film newFilm) {
-        if (newFilm.getMpaRating() == null || newFilm.getMpaRating().getRatingId() == null) {
+        if (newFilm.getMpa() == null || newFilm.getMpa().getRatingId() == null) {
             throw new IllegalArgumentException("Рейтинг MPA обязателен");
         }
-        mpaDao.findById(newFilm.getMpaRating().getRatingId())
+        mpaDao.findById(newFilm.getMpa().getRatingId())
                 .orElseThrow(() -> new NotFoundException("Рейтинг с id = " +
-                        newFilm.getMpaRating().getRatingId() + " не найден"));
+                        newFilm.getMpa().getRatingId() + " не найден"));
         if (newFilm.getGenres() != null && !newFilm.getGenres().isEmpty()) {
             for (Genre genre : newFilm.getGenres()) {
                 if (genre.getGenreId() == null) {
@@ -79,11 +79,11 @@ public class FilmServiceImpl implements FilmService {
     public Film update(Film newFilm) {
         filmDao.findById(newFilm.getId())
                 .orElseThrow(() -> new NotFoundException("Фильм с id = " + newFilm.getId() + " не найден"));
-        if (newFilm.getMpaRating() == null || newFilm.getMpaRating().getRatingId() == null) {
+        if (newFilm.getMpa() == null || newFilm.getMpa().getRatingId() == null) {
             throw new IllegalArgumentException("Рейтинг MPA обязателен");
         }
-        mpaDao.findById(newFilm.getMpaRating().getRatingId())
-                .orElseThrow(() -> new NotFoundException("Рейтинг с id = " + newFilm.getMpaRating().getRatingId() +
+        mpaDao.findById(newFilm.getMpa().getRatingId())
+                .orElseThrow(() -> new NotFoundException("Рейтинг с id = " + newFilm.getMpa().getRatingId() +
                         " не найден"));
         if (newFilm.getGenres() != null && !newFilm.getGenres().isEmpty()) {
             for (Genre genre : newFilm.getGenres()) {

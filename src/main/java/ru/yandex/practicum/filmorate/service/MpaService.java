@@ -1,12 +1,12 @@
 package ru.yandex.practicum.filmorate.service;
 
-import ru.yandex.practicum.filmorate.model.MpaRating;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.util.Collection;
 import java.util.Optional;
 
 public interface MpaService {
-    Collection<MpaRating> getAllMpaRatings();
+    Collection<Mpa> getAllMpaRatings();
 
-    Optional<MpaRating> getMpaRatingById(int id);
+    Optional<Mpa> getMpaRatingById(int id);
 }

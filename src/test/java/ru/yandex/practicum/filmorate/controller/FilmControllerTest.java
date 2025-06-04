@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.MpaRating;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Arrays;
@@ -69,10 +69,10 @@ public class FilmControllerTest {
         Integer ratingId = jdbcTemplate.queryForObject(
                 "SELECT rating_id FROM rating WHERE name = 'G'", Integer.class);
 
-        MpaRating mpaRating = new MpaRating();
-        mpaRating.setRatingId(ratingId);
-        mpaRating.setName("G");
-        film.setMpaRating(mpaRating);
+        Mpa mpa = new Mpa();
+        mpa.setRatingId(ratingId);
+        mpa.setName("G");
+        film.setMpa(mpa);
 
         user = new User();
         user.setEmail("JohnSnow" + System.currentTimeMillis() + "@mail.ru");
@@ -152,10 +152,10 @@ public class FilmControllerTest {
         Integer ratingId = jdbcTemplate.queryForObject(
                 "SELECT rating_id FROM rating WHERE name = 'G'", Integer.class);
 
-        MpaRating mpaRating = new MpaRating();
-        mpaRating.setRatingId(ratingId);
-        mpaRating.setName("G");
-        film.setMpaRating(mpaRating);
+        Mpa mpa = new Mpa();
+        mpa.setRatingId(ratingId);
+        mpa.setName("G");
+        film.setMpa(mpa);
         mockMvc.perform(MockMvcRequestBuilders.post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))

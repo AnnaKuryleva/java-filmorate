@@ -7,7 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.yandex.practicum.filmorate.model.MpaRating;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.MpaService;
 
 import java.util.Arrays;
@@ -27,24 +27,24 @@ class MpaControllerTest {
     @MockBean
     private MpaService mpaService;
 
-    private MpaRating mpaRating1;
-    private MpaRating mpaRating2;
+    private Mpa mpa1;
+    private Mpa mpa2;
 
     @BeforeEach
     void setUp() {
-        mpaRating1 = new MpaRating();
-        mpaRating1.setRatingId(1);
-        mpaRating1.setName("G");
+        mpa1 = new Mpa();
+        mpa1.setRatingId(1);
+        mpa1.setName("G");
 
 
-        mpaRating2 = new MpaRating();
-        mpaRating2.setRatingId(2);
-        mpaRating2.setName("RG");
+        mpa2 = new Mpa();
+        mpa2.setRatingId(2);
+        mpa2.setName("RG");
     }
 
     @Test
     void getAllMpaRatingsReturnsListOfRatings() throws Exception {
-        Collection<MpaRating> ratings = Arrays.asList(mpaRating1, mpaRating2);
+        Collection<Mpa> ratings = Arrays.asList(mpa1, mpa2);
         when(mpaService.getAllMpaRatings()).thenReturn(ratings);
         mockMvc.perform(get("/mpa")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -59,7 +59,7 @@ class MpaControllerTest {
 
     @Test
     void gettingRatingOnlyBasedOnExistingIdReturnsSuccessfulStatus() throws Exception {
-        when(mpaService.getMpaRatingById(1)).thenReturn(Optional.of(mpaRating1));
+        when(mpaService.getMpaRatingById(1)).thenReturn(Optional.of(mpa1));
         when(mpaService.getMpaRatingById(999)).thenReturn(Optional.empty());
         mockMvc.perform(get("/mpa/1")
                         .contentType(MediaType.APPLICATION_JSON))
