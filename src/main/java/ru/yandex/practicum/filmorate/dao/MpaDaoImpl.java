@@ -26,7 +26,7 @@ public class MpaDaoImpl implements MpaDao {
 
     @Override
     public Collection<Mpa> findAll() {
-        String sql = "SELECT * FROM rating";
+        String sql = "SELECT * FROM rating ORDER BY rating_id";
         return jdbcTemplate.query(sql, this::mapToMpaRating);
     }
 

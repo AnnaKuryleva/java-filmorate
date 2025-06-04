@@ -26,7 +26,7 @@ public class GenreDaoImpl implements GenreDao {
 
     @Override
     public List<Genre> findAll() {
-        String sql = "SELECT * FROM genres";
+        String sql = "SELECT * FROM genres ORDER BY genre_id";
         return jdbcTemplate.query(sql, this::mapToGenre);
     }
 
