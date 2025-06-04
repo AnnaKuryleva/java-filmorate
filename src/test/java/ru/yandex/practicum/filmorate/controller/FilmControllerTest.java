@@ -206,7 +206,7 @@ public class FilmControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.put("/films/1/like/99999999"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message")
-                        .value("Пользователь с id = 999 не найден"));
+                        .value("Пользователь с id = 99999999 не найден"));
     }
 
     @Test
