@@ -50,9 +50,9 @@ class MpaControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].ratingId").value(1))
+                .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].name").value("G"))
-                .andExpect(jsonPath("$[1].ratingId").value(2))
+                .andExpect(jsonPath("$[1].id").value(2))
                 .andExpect(jsonPath("$[1].name").value("RG"));
         verify(mpaService, times(1)).getAllMpaRatings();
     }
@@ -64,7 +64,7 @@ class MpaControllerTest {
         mockMvc.perform(get("/mpa/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.ratingId").value(1))
+                .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("G"));
         mockMvc.perform(get("/mpa/999")
                         .contentType(MediaType.APPLICATION_JSON))

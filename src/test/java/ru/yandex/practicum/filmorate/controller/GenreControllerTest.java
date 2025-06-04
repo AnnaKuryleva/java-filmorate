@@ -48,9 +48,9 @@ class GenreControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].genreId").value(1))
+                .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].name").value("Комедия"))
-                .andExpect(jsonPath("$[1].genreId").value(2))
+                .andExpect(jsonPath("$[1].id").value(2))
                 .andExpect(jsonPath("$[1].name").value("Драма"));
         verify(genreService, times(1)).findAll();
     }
@@ -62,7 +62,7 @@ class GenreControllerTest {
         mockMvc.perform(get("/genres/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.genreId").value(1))
+                .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Комедия"));
         mockMvc.perform(get("/genres/999")
                         .contentType(MediaType.APPLICATION_JSON))
