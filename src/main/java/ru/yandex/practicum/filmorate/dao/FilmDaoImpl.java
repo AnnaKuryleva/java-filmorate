@@ -69,8 +69,9 @@ public class FilmDaoImpl implements FilmDao {
         String sql = "INSERT INTO films (name, description, release_date, duration, rating_id) " +
                 "VALUES (?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
+
         jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
+            var ps = connection.prepareStatement(sql, new String[]{"id"});
             ps.setString(1, newFilm.getName());
             ps.setString(2, newFilm.getDescription());
             ps.setString(3, newFilm.getReleaseDate());
