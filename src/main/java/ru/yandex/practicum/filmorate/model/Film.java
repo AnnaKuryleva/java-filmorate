@@ -23,7 +23,6 @@ public class Film {
     @Positive(message = "продолжительность фильма не может быть отрицательной или равной нулю")
     private Long duration;
     private Set<Long> likes;
-    @NotEmpty(message = "Список жанров не может быть пустым")
     private Set<Genre> genres;
     @NotNull(message = "Рейтинг MPA не может быть null")
     private Mpa mpa;

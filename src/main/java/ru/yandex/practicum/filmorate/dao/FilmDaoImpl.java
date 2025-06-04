@@ -79,15 +79,12 @@ public class FilmDaoImpl implements FilmDao {
             return ps;
         }, keyHolder);
         newFilm.setId(keyHolder.getKey().longValue());
-
-        // Сохранение жанров
         if (newFilm.getGenres() != null && !newFilm.getGenres().isEmpty()) {
             String genreSql = "INSERT INTO genre_id_film_id (film_id, genre_id) VALUES (?, ?)";
             for (Genre genre : newFilm.getGenres()) {
                 jdbcTemplate.update(genreSql, newFilm.getId(), genre.getGenreId());
             }
         }
-
         return newFilm;
     }
 
