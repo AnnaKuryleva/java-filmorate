@@ -12,6 +12,8 @@ import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,12 +37,24 @@ public class FilmServiceImpl implements FilmService {
                 .orElseThrow(() -> new NotFoundException("Рейтинг с id = " +
                         newFilm.getMpa().getRatingId() + " не найден"));
         if (newFilm.getGenres() != null && !newFilm.getGenres().isEmpty()) {
-            for (Genre genre : newFilm.getGenres()) {
-                if (genre.getGenreId() == null) {
-                    throw new IllegalArgumentException("ID жанра обязателен");
-                }
-                genreDao.findById(genre.getGenreId())
-                        .orElseThrow(() -> new NotFoundException("Жанр с id = " + genre.getGenreId() + " не найден"));
+            Set<Long> uniqueGenreIds = newFilm.getGenres().stream()
+                    .map(genre -> {
+                        if (genre.getGenreId() == null) {
+                            throw new IllegalArgumentException("ID жанра обязателен");
+                        }
+                        return genre.getGenreId();
+                    })
+                    .collect(Collectors.toSet());
+            List<Genre> existingGenres = genreDao.findAllByIds(uniqueGenreIds);
+            if (existingGenres.size() != uniqueGenreIds.size()) {
+                Set<Long> foundIds = existingGenres.stream()
+                        .map(Genre::getGenreId)
+                        .collect(Collectors.toSet());
+                String missingIds = uniqueGenreIds.stream()
+                        .filter(id -> !foundIds.contains(id))
+                        .map(String::valueOf)
+                        .collect(Collectors.joining(", "));
+                throw new NotFoundException("жанры с id = [" + missingIds + "] не найдены");
             }
         }
         return filmDao.save(newFilm);
@@ -86,12 +100,24 @@ public class FilmServiceImpl implements FilmService {
                 .orElseThrow(() -> new NotFoundException("Рейтинг с id = " + newFilm.getMpa().getRatingId() +
                         " не найден"));
         if (newFilm.getGenres() != null && !newFilm.getGenres().isEmpty()) {
-            for (Genre genre : newFilm.getGenres()) {
-                if (genre.getGenreId() == null) {
-                    throw new IllegalArgumentException("ID жанра обязателен");
-                }
-                genreDao.findById(genre.getGenreId())
-                        .orElseThrow(() -> new NotFoundException("Жанр с id = " + genre.getGenreId() + " не найден"));
+            Set<Long> uniqueGenreIds = newFilm.getGenres().stream()
+                    .map(genre -> {
+                        if (genre.getGenreId() == null) {
+                            throw new IllegalArgumentException("ID жанра обязателен");
+                        }
+                        return genre.getGenreId();
+                    })
+                    .collect(Collectors.toSet());
+            List<Genre> existingGenres = genreDao.findAllByIds(uniqueGenreIds);
+            if (existingGenres.size() != uniqueGenreIds.size()) {
+                Set<Long> foundIds = existingGenres.stream()
+                        .map(Genre::getGenreId)
+                        .collect(Collectors.toSet());
+                String missingIds = uniqueGenreIds.stream()
+                        .filter(id -> !foundIds.contains(id))
+                        .map(String::valueOf)
+                        .collect(Collectors.joining(", "));
+                throw new NotFoundException("Жанры с id = [" + missingIds + "] не найдены");
             }
         }
         filmDao.updateFilm(newFilm.getId(), newFilm);

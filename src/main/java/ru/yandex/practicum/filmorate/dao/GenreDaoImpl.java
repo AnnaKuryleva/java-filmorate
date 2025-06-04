@@ -6,6 +6,8 @@ import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,5 +38,15 @@ public class GenreDaoImpl implements GenreDao {
         return jdbcTemplate.query(sql, this::mapToGenre, id)
                 .stream()
                 .findFirst();
+    }
+
+    @Override
+    public List<Genre> findAllByIds(Collection<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        String sql = "SELECT genre_id, name FROM genres WHERE genre_id IN (" +
+                String.join(",", Collections.nCopies(ids.size(), "?")) + ")";
+        return jdbcTemplate.query(sql, ids.toArray(), this::mapToGenre);
     }
 }
