@@ -1,11 +1,3 @@
-DELETE FROM likes;
-DELETE FROM friendship;
-DELETE FROM genre_id_film_id;
-DELETE FROM films;
-DELETE FROM users;
-DELETE FROM genres;
-DELETE FROM rating;
-
 -- Заполнение таблицы rating
 INSERT INTO rating (name)
 SELECT 'G' WHERE NOT EXISTS (SELECT 1 FROM rating WHERE name = 'G');

@@ -1,12 +1,14 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -15,6 +17,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.model.User;
+
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -33,6 +36,9 @@ public class FilmControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
     private ObjectMapper objectMapper;
     private Film film;
     private User user;
@@ -40,29 +46,35 @@ public class FilmControllerTest {
     @BeforeEach
     void setUp() {
         film = new Film();
-        film.setId(1L);
         film.setName("Film");
         film.setDescription("Description");
         film.setReleaseDate("2001-01-01");
         film.setDuration(120L);
 
+        Long comedyId = jdbcTemplate.queryForObject(
+                "SELECT genre_id FROM genres WHERE name = 'Комедия'", Long.class);
+        Long dramaId = jdbcTemplate.queryForObject(
+                "SELECT genre_id FROM genres WHERE name = 'Драма'", Long.class);
+
         Genre genre1 = new Genre();
-        genre1.setGenreId(1L);
+        genre1.setGenreId(comedyId);
         genre1.setName("Комедия");
 
         Genre genre2 = new Genre();
-        genre2.setGenreId(2L);
+        genre2.setGenreId(dramaId);
         genre2.setName("Драма");
 
         film.setGenres(new HashSet<>(Arrays.asList(genre1, genre2)));
 
+        Integer ratingId = jdbcTemplate.queryForObject(
+                "SELECT rating_id FROM rating WHERE name = 'G'", Integer.class);
+
         MpaRating mpaRating = new MpaRating();
-        mpaRating.setRatingId(1);
-        mpaRating.setName("RG");
+        mpaRating.setRatingId(ratingId);
+        mpaRating.setName("G");
         film.setMpaRating(mpaRating);
 
         user = new User();
-        user.setId(1L);
         user.setEmail("JohnSnow" + System.currentTimeMillis() + "@mail.ru");
         user.setLogin("JohnSnow");
         user.setName("JohnSnow");
@@ -137,6 +149,13 @@ public class FilmControllerTest {
 
     @Test
     void createValidFilmIsSuccessful() throws Exception {
+        Integer ratingId = jdbcTemplate.queryForObject(
+                "SELECT rating_id FROM rating WHERE name = 'G'", Integer.class);
+
+        MpaRating mpaRating = new MpaRating();
+        mpaRating.setRatingId(ratingId);
+        mpaRating.setName("G");
+        film.setMpaRating(mpaRating);
         mockMvc.perform(MockMvcRequestBuilders.post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))
@@ -158,15 +177,17 @@ public class FilmControllerTest {
 
     @Test
     void updateMovieWithFoundIdIsSuccessful() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+        String response = mockMvc.perform(MockMvcRequestBuilders.post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-
-        film.setId(1L);
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        Integer createdId = JsonPath.read(response, "$.id");
+        film.setId(createdId.longValue());
         film.setName("FilmUpdate");
         film.setDescription("DescriptionUpdate");
-
         mockMvc.perform(MockMvcRequestBuilders.put("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))
@@ -227,5 +248,4 @@ public class FilmControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.delete("/films/" + filmId + "/like/" + userId))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
-
 }
