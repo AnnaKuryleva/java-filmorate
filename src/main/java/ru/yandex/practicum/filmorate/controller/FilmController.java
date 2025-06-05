@@ -63,5 +63,12 @@ public class FilmController {
         log.info("Лайк пользователя с id={} у фильма с id={} удалён", userId, id);
         return films.findById(id);
     }
+
+    @GetMapping("/{id}")
+    public Film getFilmById(@PathVariable Long id) {
+        Film film = films.findById(id);
+        log.info("Получен фильм по id={}", film.getId());
+        return film;
+    }
 }
 

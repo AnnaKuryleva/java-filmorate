@@ -13,7 +13,7 @@
 ### Получить все фильмы
 Запрос возвращает список всех фильмов из базы данных вместе с их рейтингами.
 ```sql
-SELECT f.id, f.name, f.description, f.release_date, f.duration, r.name AS rating
+SELECT * AS rating
 FROM films f
 JOIN rating r ON f.rating_id = r.rating_id;
 ```
