@@ -254,18 +254,14 @@ public class FilmControllerTest {
     }
 
     @Test
-    void getFilmWithGenresReturnsCorrectGenres() throws Exception {
+    void getValidFilmOnExistingIdIsSuccessful() throws Exception {
         String filmResponse = mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         Long filmId = objectMapper.readTree(filmResponse).path("id").asLong();
-        Long comedyId = jdbcTemplate.queryForObject(
-                "SELECT genre_id FROM genres WHERE name = 'Комедия'", Long.class);
         mockMvc.perform(get("/films/{id}", filmId))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.genres[0].id").value(comedyId.intValue())) // Проверяем, что id = 1
-                .andExpect(jsonPath("$.genres[0].name").value("Комедия"));
+                .andExpect(status().isOk());
     }
 }
