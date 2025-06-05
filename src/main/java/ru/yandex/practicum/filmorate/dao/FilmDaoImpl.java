@@ -114,13 +114,30 @@ public class FilmDaoImpl implements FilmDao {
 
     @Override
     public Optional<Film> findById(Long id) {
-        String sql = "SELECT f.*, r.name AS rating_name " +
-                "FROM films f " +
-                "JOIN rating r ON f.rating_id = r.rating_id " +
-                "WHERE f.id = ?";
-        return jdbcTemplate.query(sql, this::mapToFilm, id)
-                .stream()
-                .findFirst();
+        String filmSql = "SELECT f.*, r.name AS rating_name " +
+                         "FROM films f " +
+                         "JOIN rating r ON f.rating_id = r.rating_id " +
+                         "WHERE f.id = ?";
+        List<Film> films = jdbcTemplate.query(filmSql, this::mapToFilm, id);
+        if (films.isEmpty()) {
+            return Optional.empty();
+        }
+        Film film = films.get(0);
+        String genresSql = "SELECT fg.film_id, g.genre_id, g.name " +
+                           "FROM genre_id_film_id fg " +
+                           "JOIN genres g ON fg.genre_id = g.genre_id " +
+                           "WHERE fg.film_id = ?";
+        List<Genre> genres = jdbcTemplate.query(genresSql, (rs, rowNum) -> {
+            Genre genre = new Genre();
+            genre.setGenreId(rs.getLong("genre_id"));
+            genre.setName(rs.getString("name"));
+            return genre;
+        }, id);
+        film.setGenres(new HashSet<>(genres));
+        String likesSql = "SELECT film_id, user_id FROM likes WHERE film_id = ?";
+        Set<Long> likes = new HashSet<>(jdbcTemplate.query(likesSql, (rs, rowNum) -> rs.getLong("user_id"), id));
+        film.setLikes(likes);
+        return Optional.of(film);
     }
 
     @Override
